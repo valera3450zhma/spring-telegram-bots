@@ -2,25 +2,27 @@ package springbot.deputat;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import springbot.deputat.config.BotConfig;
-
-import java.util.ArrayList;
-import java.util.List;
+import springbot.deputat.executable.DeputatExeContainer;
+import springbot.telegram.ExecutableNotFoundException;
+import springbot.telegram.UpdateProcessor;
 
 @Slf4j
 @Component
 public class DeputatBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
+    private final DeputatExeContainer executables;
 
-
-    public DeputatBot(BotConfig config) {
+    public DeputatBot(BotConfig config, @Autowired DeputatExeContainer executables) {
         this.config = config;
+        this.executables = executables;
     }
 
     @Override
@@ -35,18 +37,15 @@ public class DeputatBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
-            try {
-                execute(new SendMessage(String.valueOf(chatId), messageText));
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+        try {
+            BotApiMethodMessage message = UpdateProcessor.process(update, executables);
+            if (message != null)
+                execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        } catch (ExecutableNotFoundException e) {
+            log.error("Command '" + e.getMessage() + "' not found");
         }
-
-
     }
 
 }
