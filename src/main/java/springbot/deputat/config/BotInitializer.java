@@ -13,7 +13,7 @@ import springbot.deputat.DeputatBot;
 @Component
 public class BotInitializer {
 
-    DeputatBot bot;
+    final DeputatBot bot;
 
     public BotInitializer(DeputatBot bot) {
         this.bot = bot;
@@ -21,6 +21,7 @@ public class BotInitializer {
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() throws TelegramApiException {
+        log.info("Initializing bots");
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
             telegramBotsApi.registerBot(bot);
@@ -28,6 +29,7 @@ public class BotInitializer {
         catch (TelegramApiException e) {
             log.error("Error occurred: " + e.getMessage());
         }
+        log.info("Initializing finished successfully");
     }
 
 }
