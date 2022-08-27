@@ -9,28 +9,43 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PropertyParser {
 
-    private static final Properties propertiesFile = new Properties();
+    private static final Properties PROPERTIES_FILE = new Properties();
 
     static {
         try {
-            propertiesFile.load(new FileInputStream("src/main/resources/resources.properties"));
+            PROPERTIES_FILE.load(new FileInputStream("src/main/resources/resources.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static List<String> getList(String propertyPath) {
+        refresh();
         List<String> properties = new ArrayList<>();
-        String value = "";
-        for (int i = 0; (value = propertiesFile.getProperty(String.format("%s.%d", propertyPath, i+1))) != null; i++) {
+        String value;
+        for (int i = 0; (value = PROPERTIES_FILE.getProperty(String.format("%s.%d", propertyPath, i+1))) != null; i++) {
             properties.add(value);
         }
         return properties;
     }
 
+    public static String getProperty(String propertyPath) {
+        refresh();
+        return PROPERTIES_FILE.getProperty(propertyPath);
+    }
+
     public static String getRandom(String propertyPath) {
+        refresh();
         List<String> list = getList(propertyPath);
         return list.get(ThreadLocalRandom.current().nextInt(list.size()));
+    }
+
+    private static void refresh() {
+        try {
+            PROPERTIES_FILE.load(new FileInputStream("src/main/resources/resources.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

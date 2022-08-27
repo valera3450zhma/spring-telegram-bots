@@ -1,9 +1,7 @@
 package springbot.telegram.executable;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import springbot.deputat.config.BotConfig;
 
@@ -11,11 +9,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-@PropertySource("resources.properties")
 public abstract class Executable {
-
-    @Autowired
-    protected Environment env;
 
     @Autowired
     private BotConfig botConfig;
@@ -36,5 +30,5 @@ public abstract class Executable {
         return triggers;
     }
 
-    public abstract List<BotApiMethod<?>> run(Update update);
+    public abstract List<PartialBotApiMethod<?>> run(Update update);
 }

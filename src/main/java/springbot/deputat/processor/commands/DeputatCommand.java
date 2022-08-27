@@ -3,21 +3,19 @@ package springbot.deputat.processor.commands;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import springbot.deputat.model.User;
 import springbot.deputat.processor.DeputatExecutable;
+import springbot.deputat.processor.callbacks.EditMessage;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.Button;
+import springbot.telegram.PropertyParser;
 import springbot.telegram.generators.CallbackGenerator;
 import springbot.telegram.generators.KeyboardGenerator;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -36,11 +34,11 @@ public class DeputatCommand extends DeputatExecutable {
     }
 
     @Override
-    public List<BotApiMethod<?>> run(Update update) {
+    public List<PartialBotApiMethod<?>> run(Update update) {
         log.info("Entered DeputatCommand");
-        List<BotApiMethod<?>> actions = new ArrayList<>();
+        List<PartialBotApiMethod<?>> actions = new ArrayList<>();
 
-        String messageText = Objects.requireNonNull(env.getProperty("deputat.message"));
+        String messageText = Objects.requireNonNull(PropertyParser.getProperty("deputat.message"));
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
 
@@ -48,34 +46,14 @@ public class DeputatCommand extends DeputatExecutable {
         sendMessage.setText(messageText);
         sendMessage.setChatId(chatId);
 
-        Button[] buttons = new Button[] {new Button()};
-
-        setButton(userId, buttons[0]);
-
+        List<Button> buttons = new ArrayList<>();
+        EditMessage.setDeputatButtons(userId, buttons, userRepo);
         CallbackGenerator.setUserId(buttons, userId);
+
         sendMessage.setReplyMarkup(KeyboardGenerator.generateInline(buttons));
         actions.add(sendMessage);
-
         log.info("Executed DeputatCommand");
         return actions;
-    }
-
-    private void setButton(Long userId, Button button) {
-        Optional<User> optionalUser = userRepo.findById(userId);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (user.hasDeputat()) {
-                button.setLabel(env.getProperty("deputat.button.show"));
-                button.setCallbackData(env.getProperty("deputat.callback.show"));
-            }
-            else {
-                button.setLabel(env.getProperty("deputat.button.catch"));
-                button.setCallbackData(env.getProperty("deputat.callback.catch"));
-            }
-        } else {
-            button.setLabel(env.getProperty("deputat.button.catch"));
-            button.setCallbackData(env.getProperty("deputat.callback.catch"));
-        }
     }
 
 }

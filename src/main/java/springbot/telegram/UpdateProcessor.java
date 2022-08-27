@@ -1,7 +1,7 @@
 package springbot.telegram;
 
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import springbot.telegram.exceptions.NotAnExecutableException;
 import springbot.telegram.executable.Executable;
@@ -13,7 +13,8 @@ import java.util.List;
 @Service
 public class UpdateProcessor {
 
-    public static List<BotApiMethod<?>> process(Update update, ExecutablesContainer container) throws NotAnExecutableException, ExecutableNotFoundException {
+    public static List<PartialBotApiMethod<?>> process(Update update, ExecutablesContainer container)
+            throws NotAnExecutableException, ExecutableNotFoundException {
         String trigger = getTrigger(update);
         Executable executable = container.getExecutable(trigger);
         return executable.run(update);

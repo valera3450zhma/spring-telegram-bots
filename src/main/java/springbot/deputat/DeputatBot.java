@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -18,6 +19,9 @@ import springbot.telegram.exceptions.ExecutableNotFoundException;
 import springbot.telegram.UpdateProcessor;
 import springbot.telegram.exceptions.NotAnExecutableException;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,12 +53,10 @@ public class DeputatBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         log.info("Received an update: {}", update);
         try {
-            List<BotApiMethod<?>> actions = UpdateProcessor.process(update, executables);
-            for (BotApiMethod<?> action : actions) {
-                execute(action);
+            List<PartialBotApiMethod<?>> actions = UpdateProcessor.process(update, executables);
+            for (PartialBotApiMethod<?> action : actions) {
+                executeGeneric(action);
             }
-        } catch (TelegramApiException e) {
-            log.error("TelegramApiException", e);
         } catch (ExecutableNotFoundException e) {
             log.error("Command not found: {}", e.getMessage());
         } catch (NotAnExecutableException e) {
@@ -69,6 +71,27 @@ public class DeputatBot extends TelegramLongPollingBot {
                 commands.add(new BotCommand(command.getTrigger(), command.getDescription()));
             }
             this.execute(new SetMyCommands(commands, new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void executeGeneric(PartialBotApiMethod<?> method) {
+        for (Method m : this.getClass().getMethods()) {
+            if (m.getName().equals("execute")) {
+                if (m.getParameters()[0].getType().equals(method.getClass())) {
+                    try {
+                        m.invoke(this, method);
+                        return;
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        try {
+            this.execute((BotApiMethod<? extends Serializable>) method);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
