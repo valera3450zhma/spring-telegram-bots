@@ -1,5 +1,6 @@
 package springbot.telegram.executable;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -9,6 +10,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public abstract class Executable {
 
     @Autowired
@@ -30,5 +32,14 @@ public abstract class Executable {
         return triggers;
     }
 
-    public abstract List<PartialBotApiMethod<?>> run(Update update);
+    protected abstract List<PartialBotApiMethod<?>> run(Update update);
+
+    public List<PartialBotApiMethod<?>> execute(Update update) {
+        Long startTime = System.currentTimeMillis();
+        log.info("Entered {}", this.getClass().getName());
+        List<PartialBotApiMethod<?>> actions = run(update);
+        Long finishTime = System.currentTimeMillis();
+        log.info("Finished {}, elapsed {}", this.getClass().getName(), finishTime-startTime);
+        return actions;
+    }
 }

@@ -14,42 +14,45 @@ import springbot.telegram.PropertyParser;
 import springbot.telegram.callbacks.KeyboardGenerator;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
-public class DeputatCommand extends DeputatExecutable {
+public class AdminCommand extends DeputatExecutable {
 
     private final UserRepository userRepo;
 
     @Autowired
-    public DeputatCommand(UserRepository userRepo) {
+    public AdminCommand(UserRepository userRepo) {
         this.userRepo = userRepo;
     }
 
     @PostConstruct
     public void setTriggers() {
-        procTriggers(Command.DEPUTAT.getTrigger());
+        procTriggers(Command.ADMIN.getTrigger());
     }
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
-
-        String messageText = Objects.requireNonNull(PropertyParser.getProperty("deputat.message"));
-        Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
+        if (userRepo.findUserByIdAndAdminTrue(userId) == null) {
+            return actions;
+        }
+        prepareAdminMenu(update, actions);
+        return actions;
+    }
 
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setText(messageText);
-        sendMessage.setChatId(chatId);
-
+    private void prepareAdminMenu(Update update, List<PartialBotApiMethod<?>> actions) {
+        Long userId = update.getMessage().getFrom().getId();
+        String chatId = update.getMessage().getChatId().toString();
+        SendMessage sendMessage = new SendMessage(chatId, PropertyParser.getProperty("admin.message"));
+        sendMessage.setReplyToMessageId(update.getMessage().getMessageId());
         List<Button> buttons = new ArrayList<>();
-        EditMessage.setDeputatButtons(userId, buttons, userRepo);
-
+        EditMessage.setAdminButtons(userId, buttons);
         sendMessage.setReplyMarkup(KeyboardGenerator.generateInline(buttons));
         actions.add(sendMessage);
-        return actions;
     }
 
 }

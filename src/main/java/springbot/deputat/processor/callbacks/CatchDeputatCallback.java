@@ -11,13 +11,12 @@ import springbot.deputat.model.User;
 import springbot.deputat.processor.DeputatExecutable;
 import springbot.deputat.repo.DeputatRepository;
 import springbot.deputat.repo.UserRepository;
-import springbot.telegram.CallbackAnswer;
+import springbot.telegram.callbacks.CallbackAnswer;
 import springbot.telegram.PropertyParser;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -41,7 +40,6 @@ public class CatchDeputatCallback extends DeputatExecutable {
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
-        log.info("Entered " + this.getClass().getName());
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
         CallbackAnswer answer = new CallbackAnswer(update);
         actions.add(answer.getAnswerCallbackQuery());
@@ -51,7 +49,6 @@ public class CatchDeputatCallback extends DeputatExecutable {
         catchDeputat(answer);
         actions.addAll(EditMessage.deputatMenu(answer, userRepo));
 
-        log.info("Finished " + this.getClass().getName());
         return actions;
     }
 
@@ -65,8 +62,9 @@ public class CatchDeputatCallback extends DeputatExecutable {
         } else {
             query.setText(PropertyParser.getProperty("deputat.query.catch"));
             Deputat deputat = randomDeputat();
-            deputat = deputatRepo.save(deputat);
-            User user = new User(userId, false, deputat);
+            deputatRepo.save(deputat);
+            User user = optionalUser.orElseGet(() -> new User(userId, false, 0, deputat));
+            user.setDeputat(deputat);
             userRepo.save(user);
         }
     }
@@ -74,8 +72,9 @@ public class CatchDeputatCallback extends DeputatExecutable {
     private Deputat randomDeputat() {
         Deputat deputat = new Deputat();
 
-        int minMoney = Integer.parseInt(Objects.requireNonNull(PropertyParser.getProperty("entity.deputat.money.min")));
-        int maxMoney = Integer.parseInt(Objects.requireNonNull(PropertyParser.getProperty("entity.deputat.money.max")));
+        String[] moneyBounds = PropertyParser.getProperty("entity.deputat.money").split(" ");
+        int minMoney = Integer.parseInt(moneyBounds[0]);
+        int maxMoney = Integer.parseInt(moneyBounds[1]);
         String randomName = PropertyParser.getRandom("entity.deputat.name");
         String randomPhoto = PropertyParser.getRandom("entity.deputat.photo.level.1");
 

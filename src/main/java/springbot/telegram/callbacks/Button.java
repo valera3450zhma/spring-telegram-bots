@@ -1,4 +1,4 @@
-package springbot.telegram;
+package springbot.telegram.callbacks;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

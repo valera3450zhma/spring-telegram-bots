@@ -1,8 +1,8 @@
-package springbot.telegram.generators;
+package springbot.telegram.callbacks;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import springbot.telegram.Button;
+import springbot.telegram.callbacks.Button;
 
 import java.util.ArrayList;
 import java.util.List;

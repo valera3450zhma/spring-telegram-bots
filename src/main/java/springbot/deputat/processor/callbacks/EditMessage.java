@@ -5,10 +5,10 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import springbot.deputat.model.User;
 import springbot.deputat.repo.UserRepository;
-import springbot.telegram.Button;
-import springbot.telegram.CallbackAnswer;
+import springbot.telegram.callbacks.Button;
+import springbot.telegram.callbacks.CallbackAnswer;
 import springbot.telegram.PropertyParser;
-import springbot.telegram.generators.KeyboardGenerator;
+import springbot.telegram.callbacks.KeyboardGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +42,8 @@ public class EditMessage {
             if (user.hasDeputat()) {
                 buttons.add(new Button(PropertyParser.getProperty("deputat.button.show"),
                         PropertyParser.getProperty("deputat.callback.show")));
+                buttons.add(new Button(PropertyParser.getProperty("deputat.button.work"),
+                        PropertyParser.getProperty("deputat.callback.work")));
                 buttons.add(new Button(PropertyParser.getProperty("deputat.button.kill"),
                         PropertyParser.getProperty("deputat.callback.kill")));
             }
@@ -84,10 +86,15 @@ public class EditMessage {
     }
 
 
-    public static void setUserId(List<Button> buttons, Long userId) {
+    private static void setUserId(List<Button> buttons, Long userId) {
         for (Button button : buttons) {
             button.setCallbackData(button.getCallbackData().replace("?", userId.toString()));
         }
     }
 
+    public static void setAdminButtons(Long userId, List<Button> buttons) {
+        buttons.add(new Button(PropertyParser.getProperty("admin.button.reset_work"),
+                PropertyParser.getProperty("admin.callback.reset_work")));
+        setUserId(buttons, userId);
+    }
 }

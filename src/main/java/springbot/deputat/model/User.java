@@ -14,13 +14,18 @@ public class User {
 
     @Id
     private Long id;
-    private boolean isAdmin = false;
+    private boolean admin = false;
+    private int killedDeputats = 0;
 
     @OneToOne
     private Deputat deputat;
 
     public boolean hasDeputat() {
         return deputat != null;
+    }
+
+    public void incrementKilledDeputats() {
+        killedDeputats++;
     }
 
 }

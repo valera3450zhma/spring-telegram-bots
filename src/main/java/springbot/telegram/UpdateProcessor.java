@@ -17,7 +17,7 @@ public class UpdateProcessor {
             throws NotAnExecutableException, ExecutableNotFoundException {
         String trigger = getTrigger(update);
         Executable executable = container.getExecutable(trigger);
-        return executable.run(update);
+        return executable.execute(update);
     }
 
     private static String getTrigger(Update update) throws NotAnExecutableException {

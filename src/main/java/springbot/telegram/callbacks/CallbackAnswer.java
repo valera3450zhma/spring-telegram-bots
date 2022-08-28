@@ -1,11 +1,10 @@
-package springbot.telegram;
+package springbot.telegram.callbacks;
 
 import lombok.Data;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import java.util.List;
+import springbot.telegram.PropertyParser;
 
 @Data
 public class CallbackAnswer {
