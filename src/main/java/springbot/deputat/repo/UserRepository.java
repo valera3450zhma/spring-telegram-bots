@@ -1,7 +1,6 @@
 package springbot.deputat.repo;
 
 import org.springframework.data.repository.CrudRepository;
-import springbot.deputat.model.Deputat;
 import springbot.deputat.model.User;
 
 import javax.persistence.EntityNotFoundException;
