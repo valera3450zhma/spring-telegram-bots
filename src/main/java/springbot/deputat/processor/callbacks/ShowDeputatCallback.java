@@ -38,15 +38,14 @@ public class ShowDeputatCallback extends DeputatExecutable {
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
-        log.info("Entered ShowDeputatCallback");
+        log.info("Entered " + this.getClass().getName());
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
         CallbackAnswer answer = new CallbackAnswer(update);
         if (answer.hasNoAccess()) {
             return actions;
         }
-
         showDeputat(answer, actions);
-        log.info("Finished ShowDeputatCallback");
+        log.info("Finished " + this.getClass().getName());
         return actions;
     }
 

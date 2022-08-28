@@ -39,7 +39,7 @@ public class KillDeputatTrueCallback extends DeputatExecutable {
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
-        log.info("Entered ShowDeputatCallback");
+        log.info("Entered " + this.getClass().getName());
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
         CallbackAnswer answer = new CallbackAnswer(update);
         if (answer.hasNoAccess()) {
@@ -48,7 +48,7 @@ public class KillDeputatTrueCallback extends DeputatExecutable {
         killDeputat(answer, actions);
         actions.addAll(EditMessage.deputatMenu(answer, userRepo));
 
-        log.info("Finished ShowDeputatCallback");
+        log.info("Finished " + this.getClass().getName());
         return actions;
     }
 

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import springbot.deputat.model.Deputat;
 import springbot.deputat.model.User;
 import springbot.deputat.processor.DeputatExecutable;
 import springbot.deputat.repo.UserRepository;
@@ -35,7 +36,7 @@ public class KillDeputatFalseCallback extends DeputatExecutable {
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
-        log.info("Entered ShowDeputatCallback");
+        log.info("Entered " + this.getClass().getName());
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
         CallbackAnswer answer = new CallbackAnswer(update);
         if (answer.hasNoAccess()) {
@@ -45,15 +46,16 @@ public class KillDeputatFalseCallback extends DeputatExecutable {
         dontKillDeputat(answer, actions);
         actions.addAll(EditMessage.deputatMenu(answer, userRepo));
 
-        log.info("Finished ShowDeputatCallback");
+        log.info("Finished " + this.getClass().getName());
         return actions;
     }
 
     private void dontKillDeputat(CallbackAnswer answer, List<PartialBotApiMethod<?>> actions) {
         Optional<User> optionalUser = userRepo.findById(answer.getUserId());
         if (optionalUser.isPresent() && optionalUser.get().hasDeputat()) {
-            answer.getAnswerCallbackQuery().setText(PropertyParser.getProperty("deputat.query.kill.no")
-                    .replaceFirst("\\?", optionalUser.get().getDeputat().getName()));
+            Deputat deputat = optionalUser.get().getDeputat();
+            answer.getAnswerCallbackQuery().setText(deputat.personalize(PropertyParser
+                    .getProperty("deputat.query.kill.no")));
         } else {
             answer.getAnswerCallbackQuery().setText(PropertyParser.getProperty("error.unknown"));
         }

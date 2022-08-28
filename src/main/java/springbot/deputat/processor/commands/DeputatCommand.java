@@ -11,7 +11,6 @@ import springbot.deputat.processor.callbacks.EditMessage;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.Button;
 import springbot.telegram.PropertyParser;
-import springbot.telegram.generators.CallbackGenerator;
 import springbot.telegram.generators.KeyboardGenerator;
 
 import javax.annotation.PostConstruct;
@@ -35,7 +34,7 @@ public class DeputatCommand extends DeputatExecutable {
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
-        log.info("Entered DeputatCommand");
+        log.info("Entered " + this.getClass().getName());
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
 
         String messageText = Objects.requireNonNull(PropertyParser.getProperty("deputat.message"));
@@ -48,11 +47,10 @@ public class DeputatCommand extends DeputatExecutable {
 
         List<Button> buttons = new ArrayList<>();
         EditMessage.setDeputatButtons(userId, buttons, userRepo);
-        CallbackGenerator.setUserId(buttons, userId);
 
         sendMessage.setReplyMarkup(KeyboardGenerator.generateInline(buttons));
         actions.add(sendMessage);
-        log.info("Executed DeputatCommand");
+        log.info("Finished " + this.getClass().getName());
         return actions;
     }
 

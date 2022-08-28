@@ -5,6 +5,8 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.util.List;
+
 @Data
 public class CallbackAnswer {
 
@@ -29,4 +31,5 @@ public class CallbackAnswer {
             return true;
         }
     }
+
 }

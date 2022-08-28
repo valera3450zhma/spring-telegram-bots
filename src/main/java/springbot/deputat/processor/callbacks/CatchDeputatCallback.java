@@ -41,7 +41,7 @@ public class CatchDeputatCallback extends DeputatExecutable {
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
-        log.info("Entered CatchDeputatCallback");
+        log.info("Entered " + this.getClass().getName());
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
         CallbackAnswer answer = new CallbackAnswer(update);
         actions.add(answer.getAnswerCallbackQuery());
@@ -51,7 +51,7 @@ public class CatchDeputatCallback extends DeputatExecutable {
         catchDeputat(answer);
         actions.addAll(EditMessage.deputatMenu(answer, userRepo));
 
-        log.info("Executed CatchDeputatCallback");
+        log.info("Finished " + this.getClass().getName());
         return actions;
     }
 
@@ -66,7 +66,7 @@ public class CatchDeputatCallback extends DeputatExecutable {
             query.setText(PropertyParser.getProperty("deputat.query.catch"));
             Deputat deputat = randomDeputat();
             deputat = deputatRepo.save(deputat);
-            User user = new User(userId, deputat);
+            User user = new User(userId, false, deputat);
             userRepo.save(user);
         }
     }

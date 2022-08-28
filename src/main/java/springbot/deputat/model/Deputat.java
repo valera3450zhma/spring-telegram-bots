@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -20,5 +21,10 @@ public class Deputat {
     private int rating;
     private String photo;
     private String name;
+    private Date lastWorked;
+
+    public String personalize(String message) {
+        return message.replaceFirst("\\?", name);
+    }
 
 }

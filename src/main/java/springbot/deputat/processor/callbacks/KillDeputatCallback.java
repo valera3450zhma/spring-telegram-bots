@@ -13,7 +13,6 @@ import springbot.deputat.repo.UserRepository;
 import springbot.telegram.Button;
 import springbot.telegram.CallbackAnswer;
 import springbot.telegram.PropertyParser;
-import springbot.telegram.generators.CallbackGenerator;
 import springbot.telegram.generators.KeyboardGenerator;
 
 import javax.annotation.PostConstruct;
@@ -40,45 +39,16 @@ public class KillDeputatCallback extends DeputatExecutable {
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
-        log.info("Entered ShowDeputatCallback");
+        log.info("Entered " + this.getClass().getName());
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
         CallbackAnswer answer = new CallbackAnswer(update);
         if (answer.hasNoAccess()) {
             return actions;
         }
-        sendCheck(answer, actions);
+        actions.addAll(EditMessage.killDeputatMenu(answer, userRepo));
 
-        log.info("Finished ShowDeputatCallback");
+        log.info("Finished " + this.getClass().getName());
         return actions;
     }
-
-    private void sendCheck(CallbackAnswer answer, List<PartialBotApiMethod<?>> actions) {
-        Optional<User> optionalUser = userRepo.findById(answer.getUserId());
-        if (optionalUser.isPresent() && optionalUser.get().hasDeputat()) {
-            EditMessageText editMessageText = new EditMessageText(PropertyParser.getProperty("deputat.query.kill.check"));
-            editMessageText.setChatId(answer.getMessage().getChatId());
-            editMessageText.setMessageId(answer.getMessage().getMessageId());
-            actions.add(editMessageText);
-
-            EditMessageReplyMarkup editMessageReplyMarkup = new EditMessageReplyMarkup();
-            editMessageReplyMarkup.setChatId(answer.getMessage().getChatId());
-            editMessageReplyMarkup.setMessageId(answer.getMessage().getMessageId());
-
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(new Button(PropertyParser.getProperty("deputat.button.kill.yes"),
-                    PropertyParser.getProperty("deputat.callback.kill.yes")));
-            buttons.add(new Button(PropertyParser.getProperty("deputat.button.kill.no"),
-                    PropertyParser.getProperty("deputat.callback.kill.no")));
-
-            CallbackGenerator.setUserId(buttons, answer.getUserId());
-
-            editMessageReplyMarkup.setReplyMarkup(KeyboardGenerator.generateInline(buttons));
-            actions.add(editMessageReplyMarkup);
-        } else {
-            answer.getAnswerCallbackQuery().setText(PropertyParser.getProperty("deputat.query.exists.not"));
-            actions.add(answer.getAnswerCallbackQuery());
-        }
-    }
-
 
 }

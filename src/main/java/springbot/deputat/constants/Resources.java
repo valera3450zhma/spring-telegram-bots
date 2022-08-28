@@ -4,21 +4,6 @@ public class Resources {
 
     public static final int levels = 3;
 
-    public static final String[] names = {
-            "Ігор", "Андрюха", "Антоха", "Артур Багет", "Артьом",
-            "Бодян", "Боря", "Боян",
-            "Вадік", "Валя", "Валєра", "Ваня", "Варфоломєй", "Вася",
-            "Вернидуб", "Владік", "Володя", "Віталя", "Вітя",
-            "Гріша", "Гєна", "Даня", "Денис", "Дімас",
-            "Женя", "Жора", "Захєр", "Зеник Залупа",
-            "Кузьма", "Кіріл", "Лев", "Льоха", "Любко",
-            "Марко", "Мирось", "Мотвєй", "Місько",
-            "Назік", "Нестор", "Олєг", "Орко", "Остап",
-            "Паша", "Пєтя", "Ромко", "Ростік", "Руля",
-            "Святік", "Славік", "Стьопа", "Сєня", "Сєрий",
-            "Тарас", "Фєдя", "Юлік", "Юрчик", "Ярік"
-    };
-
     public static final String[] workedPhotos = {
             "AgACAgIAAxkBAAIc8WJTCpHiCpn7FWzQiHYP0E9Gzda8AAKjvTEb8D-ZSsKv1d7915P5AQADAgADeAADIwQ",
             "AgACAgIAAxkBAAIc82JTCq96QKgskErQ76WiOA9zyUcPAAKlvTEb8D-ZSkq2-opzop8qAQADAgADeAADIwQ",

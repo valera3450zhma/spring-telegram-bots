@@ -8,7 +8,6 @@ import springbot.deputat.repo.UserRepository;
 import springbot.telegram.Button;
 import springbot.telegram.CallbackAnswer;
 import springbot.telegram.PropertyParser;
-import springbot.telegram.generators.CallbackGenerator;
 import springbot.telegram.generators.KeyboardGenerator;
 
 import java.util.ArrayList;
@@ -50,7 +49,45 @@ public class EditMessage {
             buttons.add(new Button(PropertyParser.getProperty("deputat.button.catch"),
                     PropertyParser.getProperty("deputat.callback.catch")));
         }
-        CallbackGenerator.setUserId(buttons, userId);
+        setUserId(buttons, userId);
+    }
+
+    public static List<PartialBotApiMethod<?>> killDeputatMenu(CallbackAnswer answer, UserRepository userRepo) {
+        List<PartialBotApiMethod<?>> actions = new ArrayList<>();
+        Optional<User> optionalUser = userRepo.findById(answer.getUserId());
+        if (optionalUser.isPresent() && optionalUser.get().hasDeputat()) {
+            EditMessageText editMessageText = new EditMessageText(PropertyParser.getProperty("deputat.query.kill.check"));
+            editMessageText.setChatId(answer.getMessage().getChatId());
+            editMessageText.setMessageId(answer.getMessage().getMessageId());
+            actions.add(editMessageText);
+
+            EditMessageReplyMarkup editMessageReplyMarkup = new EditMessageReplyMarkup();
+            editMessageReplyMarkup.setChatId(answer.getMessage().getChatId());
+            editMessageReplyMarkup.setMessageId(answer.getMessage().getMessageId());
+            List<Button> buttons = new ArrayList<>();
+            setKillDeputatButtons(buttons, answer.getUserId());
+            editMessageReplyMarkup.setReplyMarkup(KeyboardGenerator.generateInline(buttons));
+            actions.add(editMessageReplyMarkup);
+        } else {
+            answer.getAnswerCallbackQuery().setText(PropertyParser.getProperty("deputat.query.exists.not"));
+            actions.add(answer.getAnswerCallbackQuery());
+        }
+        return actions;
+    }
+
+    public static void setKillDeputatButtons(List<Button> buttons, Long userId) {
+        buttons.add(new Button(PropertyParser.getProperty("deputat.button.kill.yes"),
+                PropertyParser.getProperty("deputat.callback.kill.yes")));
+        buttons.add(new Button(PropertyParser.getProperty("deputat.button.kill.no"),
+                PropertyParser.getProperty("deputat.callback.kill.no")));
+        setUserId(buttons, userId);
+    }
+
+
+    public static void setUserId(List<Button> buttons, Long userId) {
+        for (Button button : buttons) {
+            button.setCallbackData(button.getCallbackData().replace("?", userId.toString()));
+        }
     }
 
 }

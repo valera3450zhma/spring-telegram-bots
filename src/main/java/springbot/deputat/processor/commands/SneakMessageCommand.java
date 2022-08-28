@@ -22,7 +22,7 @@ public class SneakMessageCommand extends DeputatExecutable {
 
     @Override
     public List<PartialBotApiMethod<?>> run(Update update) {
-        log.info("Entered SneakMessageCommand");
+        log.info("Entered " + this.getClass().getName());
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
 
         String[] messageSplit = update.getMessage().getText().split(" ");
@@ -30,7 +30,7 @@ public class SneakMessageCommand extends DeputatExecutable {
         String textToSend = messageSplit[2];
         actions.add(new SendMessage(chatToSend, textToSend));
 
-        log.info("Executed SneakMessageCommand");
+        log.info("Finished " + this.getClass().getName());
         return actions;
     }
 
