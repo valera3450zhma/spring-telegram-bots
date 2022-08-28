@@ -1,6 +1,5 @@
 package springbot.telegram;
 
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,9 +23,8 @@ public class PropertyParser {
     public static List<String> getList(String propertyPath) {
         refresh();
         List<String> properties = new ArrayList<>();
-        String value = "";
-        for (int i = 0; value != null; i++) {
-            value = PROPERTIES_FILE.getProperty(String.format("%s.%d", propertyPath, i+1));
+        String value;
+        for (int i = 0; (value = PROPERTIES_FILE.getProperty(String.format("%s.%d", propertyPath, i+1))) != null; i++) {
             properties.add(value);
         }
         return properties;

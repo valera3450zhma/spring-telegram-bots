@@ -63,7 +63,7 @@ public class CatchDeputatCallback extends DeputatExecutable {
             query.setText(PropertyParser.getProperty("deputat.query.catch"));
             Deputat deputat = randomDeputat();
             deputatRepo.save(deputat);
-            User user = optionalUser.orElseGet(() -> new User(userId, false, 0, deputat));
+            User user = optionalUser.orElseGet(() -> new User(answer, false, 0, deputat));
             user.setDeputat(deputat);
             userRepo.save(user);
         }

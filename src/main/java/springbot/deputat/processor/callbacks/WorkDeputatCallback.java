@@ -60,6 +60,7 @@ public class WorkDeputatCallback extends DeputatExecutable {
             deputat.work(sendPhoto);
             actions.add(sendPhoto);
             deputatRepo.save(deputat);
+            userRepo.save(new User(answer, user.isAdmin(), user.getKilledDeputats(), user.getDeputat()));
         } catch (EntityNotFoundException e) {
             answer.getAnswerCallbackQuery().setText(PropertyParser.getProperty("deputat.query.exists.not"));
             actions.add(answer.getAnswerCallbackQuery());

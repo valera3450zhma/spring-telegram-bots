@@ -4,6 +4,7 @@ import lombok.Data;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import springbot.telegram.PropertyParser;
 
 @Data
@@ -12,6 +13,7 @@ public class CallbackAnswer {
     private AnswerCallbackQuery answerCallbackQuery;
     private Message message;
     private Long userId;
+    private User user;
     private Long messageOwnerId;
 
     public CallbackAnswer(Update update) {
@@ -19,6 +21,7 @@ public class CallbackAnswer {
         this.answerCallbackQuery.setShowAlert(true);
         this.message = update.getCallbackQuery().getMessage();
         this.userId = update.getCallbackQuery().getFrom().getId();
+        this.user = update.getCallbackQuery().getFrom();
         this.messageOwnerId = Long.parseLong(update.getCallbackQuery().getData().split(" ")[1]);
     }
 
