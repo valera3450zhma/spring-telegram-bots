@@ -2,6 +2,7 @@ package springbot.deputat.processor.commands;
 
 public enum Command {
     DEPUTAT("/deputat", "меню депутата"),
+    USER("/user", "меню користувача"),
     ADMIN("/admin", "меню для адмінів бота"),
     GET_USER("/get_user", "команда для адмінів шоб здеанонити вашу сраку");
 

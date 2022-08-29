@@ -3,6 +3,7 @@ package springbot.deputat.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import springbot.telegram.PropertyParser;
 import springbot.telegram.callbacks.CallbackAnswer;
 
 import javax.persistence.*;
@@ -11,33 +12,28 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class Stats {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String firstName;
-    private String username;
-    private boolean admin = false;
     private int killedDeputats = 0;
-
-    @OneToOne
-    private Deputat deputat;
-
-    public User(CallbackAnswer answer, boolean admin, int killedDeputats, Deputat deputat) {
-        id = answer.getUserId();
-        firstName = answer.getUser().getFirstName();
-        username = answer.getUser().getUserName();
-        this.admin = admin;
-        this.killedDeputats = killedDeputats;
-        this.deputat = deputat;
-    }
-
-    public boolean hasDeputat() {
-        return deputat != null;
-    }
+    private int earned = 0;
+    private int spent = 0;
 
     public void incrementKilledDeputats() {
         killedDeputats++;
     }
 
+    public void incrementEarned(int earned) {
+        this.earned += earned;
+    }
+
+    public String parseStats() {
+        String template = PropertyParser.getProperty("user.query.stats");
+        template = template.replaceFirst("\\?", String.valueOf(killedDeputats));
+        template = template.replaceFirst("\\?", String.valueOf(earned));
+        template = template.replaceFirst("\\?", String.valueOf(spent));
+        return template;
+    }
 }

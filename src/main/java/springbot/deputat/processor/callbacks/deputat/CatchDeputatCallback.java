@@ -1,4 +1,4 @@
-package springbot.deputat.processor.callbacks;
+package springbot.deputat.processor.callbacks.deputat;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,7 @@ import springbot.deputat.model.Deputat;
 import springbot.deputat.model.Stats;
 import springbot.deputat.model.User;
 import springbot.deputat.processor.DeputatExecutable;
+import springbot.deputat.processor.callbacks.MenuGenerator;
 import springbot.deputat.repo.DeputatRepository;
 import springbot.deputat.repo.StatsRepository;
 import springbot.deputat.repo.UserRepository;

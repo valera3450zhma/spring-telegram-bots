@@ -31,7 +31,8 @@ public class Deputat {
         return message.replaceFirst("\\?", name);
     }
 
-    public void work(SendPhoto sendPhoto) {
+    public int work(SendPhoto sendPhoto) {
+        int earned = 0;
         if (lastWorked != null && lastWorked.getDayOfYear() == LocalDate.now().getDayOfYear()) {
             sendPhoto.setPhoto(new InputFile(PropertyParser.getRandom("entity.deputat.worked_photo")));
             sendPhoto.setCaption(personalize(PropertyParser.getProperty("entity.deputat.work.failure")));
@@ -39,7 +40,7 @@ public class Deputat {
             String[] earn = PropertyParser.getProperty("entity.deputat.work.earn."+level).split(" ");
             int minEarn = Integer.parseInt(earn[0]);
             int maxEarn = Integer.parseInt(earn[1]);
-            int earned = ThreadLocalRandom.current().nextInt(minEarn, maxEarn + 1);
+            earned = ThreadLocalRandom.current().nextInt(minEarn, maxEarn + 1);
             sendPhoto.setPhoto(new InputFile(PropertyParser.getProperty("entity.deputat.work_photo." + level)));
             sendPhoto.setCaption(String.format("%s\n%s",
                     personalize(PropertyParser.getProperty("entity.deputat.work.success." + level)),
@@ -48,5 +49,6 @@ public class Deputat {
             lastWorked = LocalDate.now();
             money += earned;
         }
+        return earned;
     }
 }

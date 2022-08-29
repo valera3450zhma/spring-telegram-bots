@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import springbot.deputat.model.Deputat;
 import springbot.deputat.processor.DeputatExecutable;
-import springbot.deputat.processor.callbacks.EditMessage;
+import springbot.deputat.processor.callbacks.MenuGenerator;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.callbacks.CallbackAnswer;
 import springbot.telegram.PropertyParser;
@@ -43,7 +43,7 @@ public class KillDeputatFalseCallback extends DeputatExecutable {
         }
 
         dontKillDeputat(answer, actions);
-        actions.addAll(EditMessage.deputatMenu(answer, userRepo));
+        actions.addAll(MenuGenerator.deputatMenu(answer, userRepo));
 
         return actions;
     }

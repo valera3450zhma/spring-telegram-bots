@@ -8,8 +8,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import springbot.deputat.model.Deputat;
 import springbot.deputat.model.User;
 import springbot.deputat.processor.DeputatExecutable;
-import springbot.deputat.processor.callbacks.EditMessage;
+import springbot.deputat.processor.callbacks.MenuGenerator;
 import springbot.deputat.repo.DeputatRepository;
+import springbot.deputat.repo.StatsRepository;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.callbacks.CallbackAnswer;
 import springbot.telegram.PropertyParser;
@@ -25,11 +26,13 @@ public class KillDeputatTrueCallback extends DeputatExecutable {
 
     private final UserRepository userRepo;
     private final DeputatRepository deputatRepo;
+    private final StatsRepository statsRepo;
 
     @Autowired
-    public KillDeputatTrueCallback(UserRepository userRepository, DeputatRepository deputatRepo) {
+    public KillDeputatTrueCallback(UserRepository userRepository, DeputatRepository deputatRepo, StatsRepository statsRepo) {
         this.userRepo = userRepository;
         this.deputatRepo = deputatRepo;
+        this.statsRepo = statsRepo;
     }
 
 
@@ -46,7 +49,7 @@ public class KillDeputatTrueCallback extends DeputatExecutable {
             return actions;
         }
         killDeputat(answer, actions);
-        actions.addAll(EditMessage.deputatMenu(answer, userRepo));
+        actions.addAll(MenuGenerator.deputatMenu(answer, userRepo));
 
         return actions;
     }
@@ -60,7 +63,8 @@ public class KillDeputatTrueCallback extends DeputatExecutable {
                     .personalize(PropertyParser
                             .getRandom("entity.deputat.kill_message")));
             user.setDeputat(null);
-            user.incrementKilledDeputats();
+            user.getStats().incrementKilledDeputats();
+            statsRepo.save(user.getStats());
             userRepo.save(user);
             deputatRepo.delete(deputat);
         } catch (EntityNotFoundException e) {

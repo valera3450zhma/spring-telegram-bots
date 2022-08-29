@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import springbot.deputat.processor.DeputatExecutable;
-import springbot.deputat.processor.callbacks.EditMessage;
+import springbot.deputat.processor.callbacks.MenuGenerator;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.callbacks.Button;
 import springbot.telegram.PropertyParser;
@@ -36,16 +36,13 @@ public class DeputatCommand extends DeputatExecutable {
     public List<PartialBotApiMethod<?>> run(Update update) {
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
 
-        String messageText = Objects.requireNonNull(PropertyParser.getProperty("deputat.message"));
-        Long chatId = update.getMessage().getChatId();
+        String chatId = update.getMessage().getChatId().toString();
         Long userId = update.getMessage().getFrom().getId();
 
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setText(messageText);
-        sendMessage.setChatId(chatId);
+        SendMessage sendMessage = new SendMessage(chatId, PropertyParser.getProperty("deputat.message"));
 
         List<Button> buttons = new ArrayList<>();
-        EditMessage.setDeputatButtons(userId, buttons, userRepo);
+        MenuGenerator.setDeputatButtons(userId, buttons, userRepo);
 
         sendMessage.setReplyMarkup(KeyboardGenerator.generateInline(buttons));
         actions.add(sendMessage);

@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import springbot.deputat.processor.DeputatExecutable;
-import springbot.deputat.processor.callbacks.EditMessage;
+import springbot.deputat.processor.callbacks.MenuGenerator;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.callbacks.Button;
 import springbot.telegram.PropertyParser;
@@ -50,7 +50,7 @@ public class AdminCommand extends DeputatExecutable {
         SendMessage sendMessage = new SendMessage(chatId, PropertyParser.getProperty("admin.message"));
         sendMessage.setReplyToMessageId(update.getMessage().getMessageId());
         List<Button> buttons = new ArrayList<>();
-        EditMessage.setAdminButtons(userId, buttons);
+        MenuGenerator.setAdminButtons(userId, buttons);
         sendMessage.setReplyMarkup(KeyboardGenerator.generateInline(buttons));
         actions.add(sendMessage);
     }

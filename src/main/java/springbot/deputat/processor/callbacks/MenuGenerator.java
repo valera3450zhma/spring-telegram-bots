@@ -10,11 +10,12 @@ import springbot.telegram.callbacks.CallbackAnswer;
 import springbot.telegram.PropertyParser;
 import springbot.telegram.callbacks.KeyboardGenerator;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EditMessage {
+public class MenuGenerator {
 
     public static List<PartialBotApiMethod<?>> deputatMenu(CallbackAnswer answer, UserRepository userRepo) {
         List<PartialBotApiMethod<?>> actions = new ArrayList<>();
@@ -36,9 +37,8 @@ public class EditMessage {
     }
 
     public static void setDeputatButtons(Long userId, List<Button> buttons, UserRepository userRepo) {
-        Optional<User> optionalUser = userRepo.findById(userId);
-        if (optionalUser.isPresent() && optionalUser.get().hasDeputat()) {
-            User user = optionalUser.get();
+        try {
+            User user = userRepo.findUserWithDeputat(userId);
             if (user.hasDeputat()) {
                 buttons.add(new Button(PropertyParser.getProperty("deputat.button.show"),
                         PropertyParser.getProperty("deputat.callback.show")));
@@ -47,7 +47,7 @@ public class EditMessage {
                 buttons.add(new Button(PropertyParser.getProperty("deputat.button.kill"),
                         PropertyParser.getProperty("deputat.callback.kill")));
             }
-        } else {
+        } catch (EntityNotFoundException e) {
             buttons.add(new Button(PropertyParser.getProperty("deputat.button.catch"),
                     PropertyParser.getProperty("deputat.callback.catch")));
         }
@@ -97,4 +97,11 @@ public class EditMessage {
                 PropertyParser.getProperty("admin.callback.reset_work")));
         setUserId(buttons, userId);
     }
+
+    public static void setUserButtons(Long userId, List<Button> buttons) {
+        buttons.add(new Button(PropertyParser.getProperty("user.button.stats"),
+                PropertyParser.getProperty("user.callback.stats")));
+        setUserId(buttons, userId);
+    }
 }
+
