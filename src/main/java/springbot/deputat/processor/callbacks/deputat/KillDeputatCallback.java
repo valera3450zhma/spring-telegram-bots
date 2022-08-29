@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import springbot.deputat.processor.DeputatExecutable;
-import springbot.deputat.processor.callbacks.EditMessage;
+import springbot.deputat.processor.callbacks.MenuGenerator;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.callbacks.CallbackAnswer;
 import springbot.telegram.PropertyParser;
@@ -39,7 +39,7 @@ public class KillDeputatCallback extends DeputatExecutable {
         if (answer.hasNoAccess()) {
             return actions;
         }
-        actions.addAll(EditMessage.killDeputatMenu(answer, userRepo));
+        actions.addAll(MenuGenerator.killDeputatMenu(answer, userRepo));
 
         return actions;
     }

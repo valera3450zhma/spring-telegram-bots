@@ -7,9 +7,11 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import springbot.deputat.model.Deputat;
+import springbot.deputat.model.Stats;
 import springbot.deputat.model.User;
 import springbot.deputat.processor.DeputatExecutable;
 import springbot.deputat.repo.DeputatRepository;
+import springbot.deputat.repo.StatsRepository;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.callbacks.CallbackAnswer;
 import springbot.telegram.PropertyParser;
@@ -26,11 +28,13 @@ public class CatchDeputatCallback extends DeputatExecutable {
 
     private final DeputatRepository deputatRepo;
     private final UserRepository userRepo;
+    private final StatsRepository statsRepo;
 
     @Autowired
-    public CatchDeputatCallback(UserRepository userRepository, DeputatRepository deputatRepo) {
+    public CatchDeputatCallback(UserRepository userRepository, DeputatRepository deputatRepo, StatsRepository statsRepo) {
         this.deputatRepo = deputatRepo;
         this.userRepo = userRepository;
+        this.statsRepo = statsRepo;
     }
 
     @PostConstruct
@@ -47,7 +51,7 @@ public class CatchDeputatCallback extends DeputatExecutable {
             return actions;
 
         catchDeputat(answer);
-        actions.addAll(EditMessage.deputatMenu(answer, userRepo));
+        actions.addAll(MenuGenerator.deputatMenu(answer, userRepo));
 
         return actions;
     }
@@ -63,10 +67,30 @@ public class CatchDeputatCallback extends DeputatExecutable {
             query.setText(PropertyParser.getProperty("deputat.query.catch"));
             Deputat deputat = randomDeputat();
             deputatRepo.save(deputat);
-            User user = optionalUser.orElseGet(() -> new User(answer, false, 0, deputat));
-            user.setDeputat(deputat);
+            User user = setUser(optionalUser, answer, deputat);
             userRepo.save(user);
         }
+    }
+
+    private User setUser(Optional<User> optionalUser, CallbackAnswer answer, Deputat deputat) {
+        User user;
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+            if (user.getStats() == null) {
+                setStats(user);
+            }
+            user.setDeputat(deputat);
+        } else {
+            user = new User(answer, false, deputat);
+            setStats(user);
+        }
+        return user;
+    }
+
+    private void setStats(User user) {
+        Stats stats = new Stats();
+        statsRepo.save(stats);
+        user.setStats(stats);
     }
 
     private Deputat randomDeputat() {

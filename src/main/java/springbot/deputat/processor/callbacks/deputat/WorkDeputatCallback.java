@@ -10,6 +10,7 @@ import springbot.deputat.model.Deputat;
 import springbot.deputat.model.User;
 import springbot.deputat.processor.DeputatExecutable;
 import springbot.deputat.repo.DeputatRepository;
+import springbot.deputat.repo.StatsRepository;
 import springbot.deputat.repo.UserRepository;
 import springbot.telegram.callbacks.CallbackAnswer;
 import springbot.telegram.PropertyParser;
@@ -25,11 +26,13 @@ public class WorkDeputatCallback extends DeputatExecutable {
 
     private final DeputatRepository deputatRepo;
     private final UserRepository userRepo;
+    private final StatsRepository statsRepo;
 
     @Autowired
-    public WorkDeputatCallback(UserRepository userRepository, DeputatRepository deputatRepo) {
+    public WorkDeputatCallback(UserRepository userRepository, DeputatRepository deputatRepo, StatsRepository statsRepo) {
         this.deputatRepo = deputatRepo;
         this.userRepo = userRepository;
+        this.statsRepo = statsRepo;
     }
 
     @PostConstruct
@@ -57,10 +60,14 @@ public class WorkDeputatCallback extends DeputatExecutable {
             sendPhoto.setChatId(answer.getMessage().getChatId());
             sendPhoto.setReplyToMessageId(answer.getMessage().getMessageId());
             Deputat deputat = user.getDeputat();
-            deputat.work(sendPhoto);
+            int earned = deputat.work(sendPhoto);
             actions.add(sendPhoto);
-            deputatRepo.save(deputat);
-            userRepo.save(new User(answer, user.isAdmin(), user.getKilledDeputats(), user.getDeputat()));
+            if (earned != 0) {
+                deputatRepo.save(deputat);
+                user.getStats().incrementEarned(earned);
+                statsRepo.save(user.getStats());
+            }
+            userRepo.save(User.update(user, answer));
         } catch (EntityNotFoundException e) {
             answer.getAnswerCallbackQuery().setText(PropertyParser.getProperty("deputat.query.exists.not"));
             actions.add(answer.getAnswerCallbackQuery());
